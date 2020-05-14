@@ -1,0 +1,411 @@
+<!doctype html>
+<html>
+
+<head>
+    <%- include('partials/analytics'); -%>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+        integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> -->
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <title>Creator Registration</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="top">
+            <% bannerMessage.forEach(function(msg) {  %>
+            <div class="banner bounce-7 <%= msg.type %>"><%= msg.message %></div>
+            <% }); %>
+
+            <% errorMessage.forEach(function(msg) { %>
+            <div class="banner error">
+                <%= msg %>
+            </div>
+            <% }); %>
+
+            <% message.forEach(function(msg) { %>
+            <div class="banner success">
+                <%= msg %>
+            </div>
+            <% }); %>
+
+            <%- include('partials/user', {user: user}); -%>
+        </div>
+
+        <div class="content">
+            <h2 class="header">MyStore Content Creator Registration</h2>
+
+            <div class="warnings"></div>
+
+            <div class="panel-info">
+                <p>
+                    <strong>Please Note:</strong><br> Your privacy is of high importance to us. For this reason no
+                    sensitive
+                    information entered below will <strong>never</strong> touch our servers. The information required
+                    below
+                    will allow us to set
+                    up a seller's account through the Stripe API. All sensitive account information is sent to Stripe
+                    securely.
+                </p>
+            </div>
+
+            <form action="/seller-reg" id="custom_acct_form" method="post">
+                <input type="hidden" name="account-token" id="account-token">
+                <input type="hidden" name="person-token" id="person-token">
+                <input type="hidden" name="pii-token" id="pii-token">
+                <input type="hidden" name="external-token" id="external-token">
+                <div class="panel">
+                    <div class="panel-heading">General Info</div>
+                    <div class="panel-body">
+                        <label>Will you be selling content as an individual or as a company?</label>
+                        <label for="acctype" class=""><input type="radio" class=" " name="acctype" id="acctype"
+                                onclick="changeAcctType(this)" value="individual" required>
+                            Individual</label>
+                        <label for="acctype" class=""><input type="radio" class=" " name="acctype" id="acctype"
+                                onclick="changeAcctType(this)" value="company">
+                            Company</label> 
+                        <div class="panel-info">
+                            <p>
+                                Due to restrictions with international transfers, sellers registering outside the EU
+                                will
+                                need to be able to provide:
+                            </p>
+                            <ul>
+                                <li>a UK-based address (must be an address they are able to receive mail at. PO
+                                    boxes
+                                    are not valid)</li>
+                                <li>an EU-based EUR, UK-based GBP, US-based USD, NO-based NOK, SE-based SEK, and/or
+                                    DK-based DKK bank account</li>
+                                <li>a government-issued ID from any country</li>
+                            </ul>
+                            <p>
+                                Failure to do so may result in your seller's account being rejected.
+                            </p>
+                        </div>
+                        <label class="" for="sellerCountry">What is your country of residence?:</label>
+                        <select class="" name="sellerCountry" id="sellerCountry" onchange="countryChanged(this);">
+                            <%- include('partials/countrylist'); -%>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="hidden" id="furtherinfo">
+                    <!-- Company Fields -->
+                    <fieldset id="company-details" class="hidden" disabled>
+                        <div class="panel">
+                            <div class="panel-heading">Company Details</div>
+                            <div class="panel-body">
+                                <label class="" for="companyname">Company Name </label>
+                                <input class="" type="text" id="companyname" required>
+
+                                <label class=" japan-specific hidden" for="companyname_kana">Company Name
+                                    (Kana):
+                                </label>
+                                <input class=" japan-specific hidden" type="text" id="companyname_kana" disabled>
+
+                                <label class=" japan-specific hidden" for="companyname_kanji">Company Name
+                                    (Kanji):</label>
+                                <input class=" japan-specific hidden" type="text" id="companyname_kanji" disabled>
+
+                                <label class=" us-specific hidden" for="comp_business_url">Company
+                                    Website</label>
+                                <input class=" us-specific hidden" type="text" id="comp_business_url" disabled>
+
+                                <label class=" us-specific hidden" for="comp_product_description">Description
+                                    of Product/Service Provided</label>
+                                <input class=" us-specific hidden" type="text" id="comp_product_description"
+                                    value="Sound Effect/Music Recordings" required disabled>
+
+                                <label class="" for="tax_id">Business ID</label>
+                                <small>Employer ID Number in the U.S., Business Number in Canada, or a Company
+                                    Number
+                                    in the UK</small>
+                                <input class="" type="text" name="tax_id" id="tax_id" placeholder="12345678" required>
+
+                                <label class=" de-specific hidden" for="tax_id_registrar">Company
+                                    Registration Jurisdiction</label>
+                                <input class=" de-specific hidden" type="text" name="tax_id_registrar"
+                                    id="tax_id_registrar" required disabled>
+
+                                <label class="" for="vat_id">Company VAT Number</label>
+                                <input class="" type="text" name="vat_id" id="vat_id" placeholder="12345678" required>
+
+                                <label class="" for="companyphone">Company Phone Number (Including Country
+                                    Code)</label>
+                                <input class="" type="tel" name="phone" id="companyphone" placeholder="+1 234 567 890"
+                                    required>
+
+                                <label>Company Address</label>
+                                <input type="text" class="" name="line1" id="companyline1" placeholder="Address Line 1"
+                                    required>
+                                <input type="text" class="" name="line2" id="companyline2" placeholder="Address Line 2">
+                                <input type="text" class="" name="postcode" id="companypostcode" placeholder="Post Code"
+                                    required>
+                                <input type="city" class="" name="city" id="companycity" placeholder="City" required>
+                                <input type="text" class="" name="state" id="companystate"
+                                    placeholder="State/County/Province/Region">
+
+                                <label class="" for="companyCountry">Company Country</label>
+                                <select name="companyCountry" class="" id="companyCountry">
+                                    <%- include('partials/countrylist'); -%>
+                                </select>
+                                <hr>
+
+                                <!-- TODO DO DO -->
+                                <h3>Account Owner Details</h3>
+                                <label for="ao_firstname">First Name</label>
+                                <input type="text" class="" name="ao_firstname" id="ao_firstname" placeholder="Jeff"
+                                    required>
+                                <label for="ao_firstname_kana" class="japan-specific hidden">First Name
+                                    (Kana)</label>
+                                <input type="text" class=" japan-specific hidden" name="ao_firstname_kana"
+                                    id="ao_firstname_kana" placeholder="First Name (Kana)" disabled>
+                                <label for="ao_firstname_kanji" class="japan-specific hidden">First Name
+                                    (Kanji)</label>
+                                <input type="text" class=" japan-specific hidden" name="ao_firstname_kanji"
+                                    id="ao_firstname_kanji" placeholder="First Name (Kanji)" disabled>
+                                <label for="ao_lastname">Last Name</label>
+                                <input type="text" class="" name="ao_lastname" id="ao_lastname" placeholder="Jefferson"
+                                    required>
+                                <label for="ao_lastname_kana" class="japan-specific hidden">Last Name (Kana)</label>
+                                <input type="text" class=" japan-specific hidden" name="ao_lastname_kana"
+                                    id="ao_lastname_kana" placeholder="Last Name (Kana)" disabled>
+                                <label for="ao_lastname_kanji" class="japan-specific hidden">Last Name
+                                    (Kanji)</label>
+                                <input type="text" class=" japan-specific hidden" name="ao_lastname_kanji"
+                                    id="ao_lastname_kanji" placeholder="Last Name (Kanji)" disabled>
+                                <label for="ao_dob">Date of Birth</label>
+                                <input type="date" name="ao_dob" id="ao_dob" class=" date-control" required>
+                                <label for="ao_idnum">ID Number</label>
+                                <input type="text" class="" name="ao_idnum" id="ao_idnum" placeholder="123456(XY)"
+                                    required>
+
+                                <label for="ao_email">Company Contact Email Address</label>
+                                <input type="email" class="" name="ao_email" id="ao_email" placeholder="Email Address"
+                                    required>
+
+                                <label>Account Owner Address</label>
+                                <div class="panel-info noneu-specific hidden">
+                                    <p>
+                                        Sellers registering from outside the EU must be able to meet the following
+                                        requirements:
+                                    </p>
+                                    <ul>
+                                        <li>a UK-based address (must be an address they are able to receive mail at.
+                                            PO
+                                            boxes
+                                            are not valid)</li>
+                                        <li>an EU-based EUR, UK-based GBP, US-based USD, NO-based NOK, SE-based SEK,
+                                            and/or
+                                            DK-based DKK bank account</li>
+                                        <li>a government-issued ID from any country</li>
+                                    </ul>
+                                    <p>
+                                        Given the country of residency specified above, the address you provide below
+                                        must
+                                        be a valid UK-based one.
+                                    </p>
+                                </div>
+                                <input type="text" class="" name="ao_companyline1" id="ao_companyline1"
+                                    placeholder="Address Line 1" required>
+                                <input type="text" class="" name="ao_companyline2" id="ao_companyline2"
+                                    placeholder="Address Line 2">
+                                <input type="text" class="" name="ao_companypostcode" id="ao_companypostcode"
+                                    placeholder="Post Code" required>
+                                <input type="city" class="" name="ao_companycity" id="ao_companycity" placeholder="City"
+                                    required>
+                                <input type="text" class="" name="ao_companystate" id="ao_companystate"
+                                    placeholder="State/County/Province/Region">
+
+                                <label class="" for="ao_companyCountry">Account Owner Country</label>
+                                <select name="ao_companyCountry" class="" id="ao_companyCountry">
+                                    <%- include('partials/eucountrylist'); -%>
+                                </select>
+
+                                <br>
+                                <p class="panel-info">A photo of an identification document (Government-issued
+                                    passport, ID card, driver's license) is required to verify your identity.</p>
+                                <label for="ao_verification_front">Verification Document: Front</label>
+                                <input type="file" name="ao_verification_front" id="ao_verification_front"
+                                    accept=".jpeg,.jpg,.png" required>
+                                <small>Files must clearly show the full identification document and listed
+                                    information.
+                                    (Accepted formats: jpeg, jpg, png)</small>
+                                <br>
+                                <label for="ao_verification_back">Verification Document: Back</label>
+                                <input type="file" name="ao_verification_back" id="ao_verification_back"
+                                    accept=".jpeg,.jpg,.png" required>
+                                <small>Files must clearly show the full identification document and listed
+                                    information.
+                                    (Accepted formats: jpeg, jpg, png)</small>
+
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset id="individual-details">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">Individual Details</div>
+                            <div class="panel-body">
+                                <label for="firstname">First Name</label>
+                                <input type="text" class="" name="firstname" id="firstname" placeholder="Jeff" required>
+                                <label for="firstname_kana" class="japan-specific hidden">First Name (Kana)</label>
+                                <input type="text" class=" japan-specific hidden" name="firstname_kana"
+                                    id="firstname_kana" placeholder="First Name (Kana)" disabled>
+                                <label for="firstname_kanji" class="japan-specific hidden">First Name
+                                    (Kanji)</label>
+                                <input type="text" class=" japan-specific hidden" name="firstname_kanji"
+                                    id="firstname_kanji" placeholder="First Name (Kanji)" disabled>
+                                <label for="lastname">Last Name</label>
+                                <input type="text" class="" name="lastname" id="lastname" placeholder="Jefferson"
+                                    required>
+                                <label for="lastname_kana" class="japan-specific hidden">Last Name (Kana)</label>
+                                <input type="text" class=" japan-specific hidden" name="lastname_kana"
+                                    id="lastname_kana" placeholder="Last Name (Kana)" disabled>
+                                <label for="lastname_kanji" class="japan-specific hidden">Last Name (Kanji)</label>
+                                <input type="text" class=" japan-specific hidden" name="lastname_kanji"
+                                    id="lastname_kanji" placeholder="Last Name (Kanji)" disabled>
+
+                                <label for="dob">Date of Birth</label>
+                                <input type="date" name="dob" id="dob" class=" date-control" required>
+
+                                <label for="phone">Phone Number (Including Country Code)</label>
+                                <input type="text" class="" name="phone" id="phone" placeholder="+1 234 567 890"
+                                    required>
+
+                                <label for="email">Email Address</label>
+                                <input type="email" class="" name="email" id="email" placeholder="Email Address"
+                                    required>
+
+                                <label for="idnum">ID Number</label>
+                                <input type="text" class="" name="idnum" id="idnum" placeholder="123456(XY)" required>
+                                <label class="us-specific hidden" for="ssn_last_4">Last 4 Digits of Social
+                                    Number</label>
+                                <input type="text" class=" us-specific hidden" name="ssn_last_4" id="ssn_last_4"
+                                    placeholder="5678" maxlength="4" minlength="4" required disabled>
+
+                                <label class=" us-specific hidden" for="ind_business_url">Website</label>
+                                <input class=" us-specific hidden" type="text" id="ind_business_url" disabled>
+
+                                <label class=" us-specific hidden" for="ind_product_description">Description
+                                    of Product/Service Provided</label>
+                                <input class=" us-specific hidden" type="text" id="ind_product_description"
+                                    value="Sound Effect/Music Recordings" required disabled>
+
+                                <div class="panel-info noneu-specific hidden">
+                                    <p>
+                                        Sellers registering from outside the EU must be able to meet the following
+                                        requirements:
+                                    </p>
+                                    <ul>
+                                        <li>a UK-based address (must be an address they are able to receive mail at.
+                                            PO
+                                            boxes
+                                            are not valid)</li>
+                                        <li>an EU-based EUR, UK-based GBP, US-based USD, NO-based NOK, SE-based SEK,
+                                            and/or DK-based DKK bank account</li>
+                                        <li>a government-issued ID from any country</li>
+                                    </ul>
+                                    <p>
+                                        Given the country of residency specified above, the address you provide below
+                                        must
+                                        be a valid UK-based one.
+                                    </p>
+                                </div>
+                                <label>Individual Address</label>
+                                <input type="text" class="" name="line1" id="individualline1"
+                                    placeholder="Address Line 1" required>
+                                <input type="text" class="" name="line2" id="individualline2"
+                                    placeholder="Address Line 2">
+                                <input type="text" class="" name="postcode" id="individualpostcode"
+                                    placeholder="Post Code" required>
+                                <input type="city" class="" name="city" id="individualcity" placeholder="City" required>
+                                <input type="text" class="" name="state" id="individualstate"
+                                    placeholder="State/County/Province/Region">
+
+                                <label class="" for="individualCountry">Individual Country</label>
+                                <select name="individualCountry" class="" id="individualCountry">
+                                    <%- include('partials/eucountrylist'); -%>
+                                </select>
+
+                                <br>
+                                <p class="panel-info">A photo of an identification document (Government-issued
+                                    passport, ID card,
+                                    driver's license) is required to verify your identity.</p>
+                                <label for="verification_front">Verification Document: Front</label>
+                                <input type="file" name="verification_front" id="verification_front"
+                                    accept=".jpeg,.jpg,.png" required>
+                                <small>Files must clearly show the full identification document and listed
+                                    information.
+                                    (Accepted formats: jpeg, jpg, png)</small>
+                                <br>
+                                <label for="verification_back">Verification Document: Back</label>
+                                <input type="file" name="verification_back" id="verification_back"
+                                    accept=".jpeg,.jpg,.png" required>
+                                <small>Files must clearly show the full identification document and listed
+                                    information.
+                                    (Accepted formats: jpeg, jpg, png)</small>
+                            </div>
+                        </div>
+                    </fieldset>
+
+
+                    <!-- External Account -->
+                    <div class="panel panel-default">
+                        <div class="panel-heading">Linked Bank Account</div>
+                        <div class="panel-body">
+                            <p class="panel-info">Bank account must belong to a physical bank (no digital bank
+                                accounts such as Revolut, Monzo etc.)</p>
+                            <label class="" for="account-holder-name">Bank Account Holder Full
+                                Name</label>
+                            <input class="" type="text" name="account-holder-name" id="account-holder-name"
+                                placeholder="Jeff Johnson">
+
+                            <label class="" for="accountCurrency">Account Currency:</label>
+                            <select class="" name="accountCurrency" id="accountCurrency">
+                                <%- include('partials/currencies'); -%>
+                            </select>
+
+                            <label class="" for="bankAcctCountry">Account Country</label>
+                            <select name="bankAcctCountry" class="" id="bankAcctCountry">
+                                <%- include('partials/countrylist'); -%>
+                            </select>
+
+                            <label class="" for="bankaccnum">Bank Account Number</label>
+                            <input class="" type="text" name="bankaccnum" id="bankaccnum">
+
+                            <label class="" for="routingNum">Sort Code/Routing Number (or
+                                equivalent)</label>
+                            <input class="" type="text" name="routingNum" id="routingNum">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-info panel-warning hidden" id="toc_acceptance_warning">In order to be authorised as a
+                    registered seller on MyStore and receive payments to your account, you must first agree to the
+                    terms
+                    mentioned below.</div>
+                <label for="toc_acceptance_stripe">
+                    <input type="checkbox" name="toc_acceptance" id="toc_acceptance_stripe">
+                    I agree to <a href="/terms" target="_blank">MyStore terms and conditions</a> and the <a
+                        href="https://stripe.com/us/connect-account/legal" target="_blank">Stripe
+                        Connected Account Agreement</a>.
+                </label>
+
+                <input class="button" type="submit" value="Submit">
+            </form>
+        </div>
+
+        <%- include('partials/footer'); -%>
+    </div>
+</body>
+
+<script src="/static/scripts/menu.js"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<script src="/static/scripts/stripe_connect.js"></script>
+
+</html>

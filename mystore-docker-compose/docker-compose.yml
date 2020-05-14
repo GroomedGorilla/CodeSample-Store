@@ -1,0 +1,91 @@
+version: '2.1'
+services:
+    nginx:
+        image: mystore_nginx
+        depends_on:
+            - mystore
+        environment:
+            - MY_DOMAIN_NAME=julianzammit.com
+        restart: always
+        ports:
+            - "80:80"
+            - "443:443"
+            - "8443:8443"
+        volumes:
+            - ../conf/letsencrypt/conf:/etc/letsencrypt
+            - ../conf/letsencrypt/html:/tmp/letsencrypt
+
+    mysql:
+        image: groomedgorilla/mysql:8.0.3
+        container_name: db
+        volumes:
+            - database:/var/lib/mysql
+        environment:
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+            MYSQL_USER: "jzdev"
+            MYSQL_PASSWORD: "pass123"
+            MYSQL_DATABASE: "jz_database"
+        healthcheck:
+            test: "exit 0"
+            # test: ["CMD", "mysqladmin", "ping", "-h", "mysql"]
+            # timeout: 20s
+            # retries: 10
+        ports:
+            - "4404:3306" #MYSQL DB
+
+
+    mystore:
+        image: groomedgorilla/mystore:latest
+        container_name: mystore
+        environment:
+            S3_SECRET_KEY: "s3secretkey"
+            S3_PUBLIC_KEY: "s3publickey"
+            CLIENT_SECRET_KEY: "clientsecretkey"
+            HOSTNAME: "https://julianzammit.com/mystore"
+            EMAIL: "admin@julianzammit.com"
+            SUPPORT_EMAIL: "support@julianzammit.com"
+            REDIS_HOST: redis
+            STRIPE_SECRET: "stripe (test) secret key"
+            STRIPE_PUBLIC: "stripe (test) public key"
+            STRIPE_CONNECT_ENDPOINT_SECRET: "stripe connect endpoint key"
+            STRIPE_ACCOUNT_ENDPOINT_SECRET: "stripe account endpoint key"
+            S3_BUCKET: "julianz.mystore.media"
+            S3_PREVIEW_BUCKET: "julianz.mystore.previews"
+        depends_on:
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_started
+        entrypoint:
+            - /usr/local/bin/docker-entrypoint.sh
+        ports:
+            - "8080:8080"
+            - "9229:9229"
+
+    letsencrypt:
+        image: mystore_letsencrypt
+        volumes:
+            - /etc/localtime:/etc/localtime:ro
+            - ../conf/letsencrypt/conf:/etc/letsencrypt
+            - ../conf/letsencrypt/html:/tmp/letsencrypt
+        environment:
+            - DOMAINS=julianzammit.com/mystore
+            - EMAIL=admin@julianzammit.com
+            - WEBROOT_PATH=/tmp/letsencrypt
+            - EXP_LIMIT=30
+            - CHECK_FREQ=3
+        depends_on:
+            - nginx
+
+    redis:
+        image: redis:5.0-rc
+        container_name: jobqueue
+        # command: ["redis-server", "--appendonly", "yes"]
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis-data:/data
+
+volumes:
+    database:
+    redis-data:

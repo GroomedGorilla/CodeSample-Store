@@ -1,0 +1,190 @@
+<!doctype html>
+<html>
+
+<head>
+    <%- include('partials/analytics'); -%>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+        integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <title><%= user.name %> - Profile</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="top">
+            <% bannerMessage.forEach(function(msg) {  %>
+            <div class="banner bounce-7 <%= msg.type %>"><%= msg.message %></div>
+            <% }); %>
+
+            <% errorMessage.forEach(function(msg) { %>
+            <div class="banner error">
+                <%= msg %>
+            </div>
+            <% }); %>
+
+            <div class="banner success <% if (noMessage) { %> hidden<% } %>">
+                <%= successMsg %>
+            </div>
+
+            <%- include('partials/user', {user: user}); -%>
+        </div>
+
+        <div class="content">
+            <h2 class="header"><%= user.name %>'s Page</h2>
+
+            <%if (user.soundEditor) { %>
+            <div class="profile-seller">
+                <% switch (user.stripe_status) {
+                                case 'confirmed' : %>
+                <h3>Seller Status: Registered Seller</h3>
+                <p>Congrats! You are a registered MyStore seller! Your Stripe account has been linked to
+                    MyStore's platform and you can now upload sounds and receive payment for their sales!</p>
+                <% break;
+
+                                case 'pending' : %>
+                <h3>Seller Status: Authorised For Registration</h3>
+
+                <p>Your Seller application has been received and is being processed. You'll receive an update or
+                    confirmation email shortly.
+                </p>
+                <% break;
+
+                                case 'disabled' : %>
+                <h3>Seller Status: Disabled</h3>
+
+                <p>Your seller account has been temporarily disabled. Please <a
+                        href="mailto:support@mystore.com?Subject=Disabled Seller Account">contact support</a> if
+                    you are unaware of these changes.
+                </p>
+                <% break;
+
+                                case 'reqs_due' : %>
+                <h3>Seller Status: Additional Information Needed</h3>
+
+                <p>Your seller account has temporarily been put on hold since further verification information is required. Please <a
+                        href="mailto:support@mystore.com?Subject=Requirements Due for Seller Account">contact support</a> for further details and to re-enable your account.
+                </p>
+                <% break;
+
+                                default: %>
+                <h3>Seller Status: Authorised For Registration</h3>
+
+                <p>In order to upload and sell your content on the MyStore platform you'll need to register as a
+                    seller. This allows us to process payments from users and to route those funds to your account.
+                    <br>
+                    Click below to get started:
+                </p>
+
+                <a href="/seller-reg" class="button button-alert">Register Seller Account</a>
+                <% break;
+
+                                } %>
+
+                <img loading="lazy" src="/static/assets/images/Stripe badge/Outline Light/powered_by_stripe.svg"
+                    alt="Powered by Stripe">
+            </div>
+            <% } %>
+
+            <div class="profile-info">
+                <form id="form-profile" action="/profile" method="post">
+                    <fieldset disabled>
+                        <div class="profile-deets">
+                            <label for="name">Name:
+                                <input type="text" class="profile-attribute" name="name"
+                                    value="<%= user.name %>"></label>
+
+                            <label for="surname">Surname:
+                                <input type="text" class="profile-attribute" name="surname"
+                                    value="<%= user.surname %>"></label>
+
+                            <label for="email">Email:
+                                <input type="email" class="profile-attribute" name="email"
+                                    value="<%= user.email %>"></label>
+
+                            <label for="dob">Date of Birth:
+                                <input type="date" class="profile-attribute" name="dob" <%if (user.dob) {
+                                    %> value="<%= new Date(user.dob).toISOString().substring(0,10) %>"
+                                    <% }; %>></label>
+
+                            <label for="profession">Profession/Industry:
+                                <input type="text" class="profile-attribute" name="profession"
+                                    value="<%= user.profession %>"></label>
+                        </div>
+                    </fieldset>
+
+                    <div class="profile-controls">
+                        <button type="button" name="btnEnableEdits" class="button button-alert"
+                            onclick="enableEdits(this)">
+                            <i class="fa fa-edit"></i> Edit
+                        </button>
+                        <button type="button" name="btnCancelEdits" class="button button-warning hidden"
+                            onclick="cancelEdits(this)">
+                            <i class="far fa-window-close"></i> Cancel
+                        </button>
+                        <button type="button" name="btnSaveEdits" class="button button-main hidden"
+                            onclick="saveProfileEdits(this)">
+                            <i class="far fa-save"></i> Save
+                        </button>
+                        <button id="btnChangePass" type="button" class="button" onclick="enablePass(this)">
+                            <i class="fa fa-edit"></i> Change Password
+                        </button>
+                    </div>
+                </form>
+
+                <form id="form-pass" class="hidden" action="/profile/changepass" method="POST">
+                    <div class="pass-fields">
+                        <label for="oldPass">Current Password</label>
+                        <input type="password" class="pass-attribute" name="oldPass" minlength="8" required>
+
+                        <p class="text-info">Passwords must be at least 8 characters long and include a
+                            combination of numbers, letters and symbols.</p>
+
+                        <label for="newPass">New Password</label>
+                        <input id="newPass" name="newPass" type="password" class="pass-attribute" minlength="8"
+                            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?#.&])[A-Za-z0-9@$!%*?#.&]{8,}.*"
+                            oninput="setCustomValidity('')" oninvalid="setCustomValidity(
+                                'Must be 8 or more characters long and contain one number, one uppercase and lowercase letter and a symbol'
+                            )" required>
+
+                        <label for="confirmPass">Confirm Password</label>
+                        <input id="confirmPass" name="confirmPass" type="password" class="pass-attribute" minlength="8"
+                            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?#.&])[A-Za-z0-9@$!%*?#.&]{8,}.*"
+                            onkeyup="checkNewPass(this)" oninvalid="setCustomValidity(
+                                'Must be 8 or more characters long and contain one number, one uppercase and lowercase letter and a symbol'
+                            )" oninput="setCustomValidity('')" required>
+
+                        <ul id="passWarning" class="hidden">
+                            <li class="text-danger">New passwords must match.</li>
+                            <li class="text-danger">Must include lowercase and uppercase letters</li>
+                            <li class="text-danger">Must be at least 8 characters in length, and a maximum of
+                                16</li>
+                            <li class="text-danger">Must contain at least one number and one symbol</li>
+                        </ul>
+                    </div>
+
+                    <div class="pass-controls">
+                        <button type="button" name="btnCancelPass" class="button button-warning"
+                            onclick="cancelPass(this)">
+                            <i class="far fa-window-close"></i> Cancel
+                        </button>
+                        <button type="submit" name="btnSubmitPass" class="button button-main">
+                            <i class="far fa-save"></i>Save New Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <%- include('partials/footer'); -%>
+    </div>
+</body>
+
+<script src="/static/scripts/menu.js"></script>
+<script src="/static/scripts/user_mgmt.js"></script>
+
+</html>

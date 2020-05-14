@@ -1,0 +1,4 @@
+CREATE DATABASE IF NOT EXISTS jz_database;
+GRANT ALL PRIVILEGES on jz_database.*
+TO 'jzdev'@'%' IDENTIFIED BY 'pass123'
+WITH GRANT OPTION;

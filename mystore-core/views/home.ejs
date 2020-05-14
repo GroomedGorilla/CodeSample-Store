@@ -1,0 +1,260 @@
+<!-- views/index.ejs -->
+<!doctype html>
+<html>
+
+<head>
+    <%- include('partials/analytics'); -%>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> -->
+    <!-- load bootstrap css -->
+    <!-- <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> -->
+    <!-- load fontawesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+        integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/2.0.6/wavesurfer.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <title>MyStore - The Sound Discovery Platform</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="top">
+            <% bannerMessage.forEach(function(msg) {  %>
+            <div class="banner bounce-7 <%= msg.type %>"><%= msg.message %></div>
+            <% }); %>
+
+
+            <% errorMessage.forEach(function(msg) { %>
+            <div class="banner error">
+                <%= msg %>
+            </div>
+            <% }); %>
+
+            <div class="row">
+                <div id="success" class="banner success <% if (noMessage) { %> hidden<% } %>">
+                    <%= successMsg %>
+                </div>
+            </div>
+
+            <%- include('partials/user', {user: user}); -%>
+
+            <div class="hero">
+                <h2>The Sound Discovery Platform</h2>
+            </div>
+        </div>
+
+        <div class="playback">
+            <div id="waveform-container" class="player">
+                <div id="waveform"></div>
+
+                <div class="lds-ripple hidden">
+                    <div></div>
+                    <div></div>
+                </div>
+
+                <button id="play-pause" class="" onclick="togglePlay()">
+                    <i class="fas fa-play-circle fa-4x play-pause-icon"></i>
+                </button>
+
+            </div>
+            <div class="sound-info hidden">
+                <h4>-</h4>
+                <em>-</em>
+                <a class="hidden" href="">Add To Cart</a>
+            </div>
+        </div>
+
+        <form class="searchform" action="/home" method="GET" id="searchbar">
+            <div class="searchbar">
+                <input type="text" name="search" id="query" placeholder="Search by name & keywords">
+                <input type="submit" class="" value="Search">
+            </div>
+
+            <div class="filtertype">
+                <label for="category">Filter by:</label>
+                <select name="category" onchange="changeSubCat(this)">
+                    <option value="anyCat" selected>Any</option>
+                    <option value="sound">SFX</option>
+                    <option value="music">Music</option>
+                </select>
+            </div>
+
+            <div class="form-group filtercat hidden" id="subCats">
+                <label for=" subCategory">Sub-Category:</label>
+                <select name="subCategory" id="soundSubs" disabled>
+                    <option value="anySfxCat" selected="selected">Any</option>
+                    <% soundCategories.forEach(function(sound) { %>
+                    <option value="<%= sound.name.toLowerCase() %>">
+                        <%= sound.name %>
+                    </option>
+                    <% }); %>
+                </select>
+
+                <select name="subCategory" id="musicSubs" disabled>
+                    <option value="anyMusicCat" selected="selected">Any</option>
+                    <% musicCategories.forEach(function(music) { %>
+                    <option value="<%= music.name.toLowerCase() %>">
+                        <%= music.name %>
+                    </option>
+                    <% }); %>
+                </select>
+            </div>
+
+            <div class="form-group filtersort">
+                <label for="sort">Sort by:</label>
+                <select name="sort">
+                    <option value="name" selected>Name</option>
+                    <option value="priceHigh">Price: High to Low</option>
+                    <option value="priceLow">Price: Low to High</option>
+                    <option value="date">Recent</option>
+                    <!-- <option value="editor">Sound Editor</option> -->
+                    <!-- <option value="rating">User Rating</option> -->
+                </select>
+            </div>
+        </form>
+
+
+        <div class="content">
+            <%if (soundsList.length > 0) { %>
+            <h2 class="header">Our 100 Newest Additions</h2>
+            <div class="sounds">
+                <% soundsList.forEach(function(sound) { %>
+                <div class="sound-item">
+                    <div class="sound">
+                        <span class="sound-name"><%=`${sound.name}`%></span>
+                    </div>
+                    <span class="sound-price"><%=`£${sound.price / 100}`%></span>
+                    <div class="sound-controls">
+                        <button class="fa fa-play" onclick='loadPreview(this, "<%= sound.previewLocation %>")'></button>
+                        <button class="fa fa-pause" onclick='wavesurfer.pause()'></button>
+                        <%if(sound.soundEditor == user.id) { %>
+                        <a title='Original Uploader - View Here' class="uploader" href="/mysounds"><span
+                                class="sound-badge">Uploader</span></a>
+                        <% } else if(owned.includes(sound.id)){ %>
+                        <a title='Already Owned - View Here' class="owner" href="/purchases"><span
+                                class="sound-badge">Owned</span></a>
+                        <% } else { %>
+                        <a href="/addToCart/<%= sound.uuid %>">
+                            <button class="fa fa-cart-plus cart-add"></button>
+                        </a>
+                        <% } %>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+            <% } else if (searchResults.length > 0){%>
+            <h2 id='searchTitle' class="header">Search Results
+                <%if (session.search.search != ""){ %>
+                for "<%=session.search.search %>"
+                <% } %>:</h2>
+
+                <% if(pages.total > 1) { %>
+                    <h3>Showing Page <%= pages.current %> of <%= pages.total %></h3>
+                    <div id='result-pages'>
+                        <% for(var i=1; i<pages.total+1; i++) {%>
+                        <a <% if(i!=pages.current) {%>href="/home?<%= queryStr %>&page=<%= i %>" <% } %>
+                            class="button <% if(i==pages.current) {%>button-alert<% } %> "><%= i %></a>
+                        <% } %>
+                    </div>
+                    <% } %>
+            <div class="sounds">
+                <% searchResults.forEach(function(sound) { %>
+                <div class="sound-item">
+                    <div class="sound">
+                        <span class="sound-name"><%=`${sound.name}`%></span>
+                    </div>
+                    <span class="sound-price"><%=`£${sound.price / 100}`%></span>
+                    <div class="sound-controls">
+                        <button class="fa fa-play" onclick='loadPreview(this, "<%= sound.previewLocation %>")'></button>
+                        <button class="fa fa-pause" onclick='wavesurfer.pause()'></button>
+                        <%if(sound.soundEditor == user.id) { %>
+                        <a title='Original Uploader - View Here' class="uploader" href="/mysounds"><span
+                                class="sound-badge">Uploader</span></a>
+                        <% } else if(owned.includes(sound.id)){ %>
+                        <a title='Already Owned - View Here' class="owner" href="/purchases"><span
+                                class="sound-badge">Owned</span></a>
+                        <% } else { %>
+                        <a href="/addToCart/<%= sound.uuid %>">
+                            <button class="fa fa-cart-plus cart-add"></button>
+                        </a>
+                        <% } %>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+            <% } else {%>
+            <h2 id='searchTitle' class="header">No results found.</h2>
+            <hr>
+
+            <%if (similarResults.length > 0) { %>
+            <h2 class="header">Similar sounds from other categories:</h2>
+            <div class="sounds">
+                <% similarResults.forEach(function(sound) { %>
+                <div class="sound-item">
+                    <div class="sound">
+                        <span class="sound-name"><%=`${sound.name}`%></span>
+                    </div>
+                    <span class="sound-price"><%=`£${sound.price / 100}`%></span>
+                    <div class="sound-controls">
+                        <button class="fa fa-play" onclick='loadPreview(this,"<%= sound.previewLocation %>")'></button>
+                        <button class="fa fa-pause" onclick='wavesurfer.pause()'></button>
+                        <%if(sound.soundEditor == user.id) { %>
+                        <a title='Original Uploader - View Here' class="uploader" href="/mysounds"><span
+                                class="sound-badge">Uploader</span></a>
+                        <% } else if(owned.includes(sound.id)){ %>
+                        <a title='Already Owned - View Here' class="owner" href="/purchases"><span
+                                class="sound-badge">Owned</span></a>
+                        <% } else { %>
+                        <a href="/addToCart/<%= sound.uuid %>">
+                            <button class="fa fa-cart-plus cart-add"></button>
+                        </a>
+                        <% } %>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+            <% }} %>
+        </div>
+
+        <%- include('partials/footer'); -%>
+    </div>
+</body>
+
+
+<script src="/static/scripts/audio.js"></script>
+<script src="/static/scripts/menu.js"></script>
+<!-- Important for script to be added after body -->
+<script>
+    (function () {
+        <% if(session.search) { %>
+
+        const searchTtl = document.getElementById('searchTitle')
+        searchTtl.scrollIntoView({behavior: "smooth", block: "start"});
+
+
+        document.getElementById("query").value = "<%= session.search.search %>";
+
+        var catSelector = document.querySelectorAll('select[name="category"]')[0];
+        catSelector.value = "<%= session.search.category %>";
+
+        <% switch (session.search.category) {
+                case 'music' : %>
+        document.getElementById('musicSubs').value = "<%= session.search.subCategory %>"
+        <% break;
+
+                case 'sound' : %>
+        document.getElementById('soundSubs').value = "<%= session.search.subCategory %>"
+        <% break;
+            } %>
+
+        changeSubCat(catSelector);
+        <% }%>
+    })();
+</script>
+
+</html>

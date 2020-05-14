@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+
+<head>
+</head>
+
+<body>
+    <header class="topnav" id="header">
+        <a href="/home">
+            <div class="logo">
+                <div title="MyStore Logo" id="logo">
+                    <div id="logo-img"></div>
+                </div>
+                <h1>MyStore</h1>
+            </div>
+        </a>
+
+        <a href="javascript:void(0);" style="font-size:2em;" class="icon" onclick="respMenu()">&#9776;</a>
+        <nav class="menu">
+            <% if(user) { %>
+            <div class="menu-opt">
+                <span class="fa fa-shopping-cart menu-icon"></span>
+                <div>
+                    <a class="menu-item" href="/basket">Cart</a>
+                </div>
+                <% if(session.cart) { %>
+                <span class="badge">
+                    <%= session.cart.totalQty %>
+                </span>
+                <% } %>
+            </div>
+            <% if(user.admin || user.registeredSeller ) { %>
+            <div class="dropdown">
+                <span class="fa fa-headphones-alt menu-icon"></span>
+                <button class="dropbtn menu-item">Seller
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="/mysounds">My Sounds</a>
+                    <a href="/upload">Upload</a>
+                </div>
+            </div>
+            <% } %>
+            <div class="dropdown">
+                <span class="fa fa-user menu-icon"></span>
+                <button id="menu-user-name" class="dropbtn menu-item"><%= user.name %>
+                    <i class="fa fa-caret-down"></i>
+                </button>
+                <div class="dropdown-content">
+                    <a href="/profile">Profile</a>
+                    <a href="/purchases">My Collection</a>
+                    <a href="/logout" style="background-color: #c82e2ede; color: white">Logout</a>
+                </div>
+            </div>
+            <% } else { %>
+            <div class="menu-opt">
+                <div>
+                    <a class="menu-item" href="/login">Sign In</a>
+                </div>
+            </div>
+            <% } %>
+        </nav>
+    </header>
+</body>
+
+</html>

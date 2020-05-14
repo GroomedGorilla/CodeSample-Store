@@ -1,0 +1,4 @@
+CREATE DATABASE IF NOT EXISTS onym_database;
+GRANT ALL PRIVILEGES on onym_database.*
+TO 'jzdev'@'%' IDENTIFIED BY 'pass123'
+WITH GRANT OPTION;

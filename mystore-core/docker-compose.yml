@@ -1,0 +1,66 @@
+version: '2.1'
+services:
+    mysql:
+        image: groomedgorilla/mysql:8.0.3
+        container_name: db
+        build: ./db_config
+        volumes:
+            - database:/var/lib/mysql
+        environment:
+            MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+            MYSQL_USER: "jzdev"
+            MYSQL_PASSWORD: "pass123"
+            MYSQL_DATABASE: "jz_database"
+        healthcheck:
+            test: "exit 0"
+            # test: ["CMD", "mysqladmin", "ping", "-h", "mysql"]
+            # timeout: 20s
+            # retries: 10
+        ports:
+            - "4404:3306" #MYSQL DB
+
+
+    mystore:
+        image: groomedgorilla/mystore:latest
+        container_name: mystore
+        build: .
+        environment:
+            S3_SECRET_KEY: "s3secretkey"
+            S3_PUBLIC_KEY: "s3publickey"
+            CLIENT_SECRET_KEY: "clientsecretkey"
+            HOSTNAME:  "http://localhost:8080"
+            EMAIL: "admin@julianzammit.com"
+            SUPPORT_EMAIL: "support@julianzammit.com"
+            REDIS_HOST: redis
+            STRIPE_SECRET: "stripe (test) secret key"
+            STRIPE_PUBLIC: "stripe (test) public key"
+            # ngrok STRIPE_CONNECT_ENDPOINT_SECRET: "stripe (test) connect ndpoint key for ngrok"
+            # ngrok STRIPE_ACCOUNT_ENDPOINT_SECRET: "stripe (test) account endpoint key for ngrok"
+            STRIPE_CONNECT_ENDPOINT_SECRET: "stripe connect endpoint key"
+            STRIPE_ACCOUNT_ENDPOINT_SECRET: "stripe account endpoint key"
+            S3_BUCKET: "julianz.mystore.media"
+            S3_PREVIEW_BUCKET: "julianz.mystore.previews"
+
+        depends_on:
+            mysql:
+                condition: service_healthy
+            redis:
+                condition: service_started
+        entrypoint:
+            - /usr/local/bin/docker-entrypoint.sh
+        ports:
+            - "8080:8080" #Need the mapping for local. For Prod too? Otherwise just "8080"
+            - "9229:9229"
+
+    redis:
+        image: redis:5.0-rc
+        container_name: jobqueue
+        # command: ["redis-server", "--appendonly", "yes"]
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis-data:/data
+
+volumes:
+    database:
+    redis-data:

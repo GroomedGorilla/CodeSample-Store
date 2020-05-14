@@ -1,0 +1,57 @@
+{
+  "name": "mystore_alpha",
+  "version": "0.0.1",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "test",
+    "start": "node server.js",
+    "migrate": "knex migrate:latest",
+    "rollback": "knex migrate:rollback",
+    "start-docker": "pm2-docker start pm2_configs/config.json",
+    "start-dev": "pm2-dev start pm2_configs/config.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+git@github.com:GroomedGorilla/Store-CodeSample.git"
+  },
+  "author": "Julian Zammit",
+  "license": "ISC",
+  "homepage": "https://julianzammit.com/mystore",
+  "dependencies": {
+    "aws-sdk": "^2.251.1",
+    "axios": "^0.18.0",
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.18.3",
+    "bookshelf": "^0.12.1",
+    "connect-flash": "^0.1.1",
+    "connect-session-knex": "^1.4.0",
+    "cookie-parser": "^1.4.3",
+    "crypto-js": "^3.1.9-1",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "express-session": "^1.15.6",
+    "express-validator": "^5.2.0",
+    "ffmpeg-static": "^2.3.0",
+    "fine-uploader": "5.16.2",
+    "fluent-ffmpeg": "^2.1.2",
+    "knex": "^0.14.6",
+    "kue": "^0.11.6",
+    "kue-ui-express": "^1.1.1",
+    "lodash": "^4.17.11",
+    "mailgun-js": "^0.20.0",
+    "method-override": "^2.3.10",
+    "morgan": "^1.9.0",
+    "multer": "^1.3.1",
+    "music-metadata": "^3.1.6",
+    "mysql": "^2.15.0",
+    "passport": "^0.4.0",
+    "passport-local": "^1.0.0",
+    "path": "^0.12.7",
+    "serve-favicon": "^2.5.0",
+    "stripe": "^6.28.0"
+  },
+  "devDependencies": {
+    "webpack": "^4.29.6"
+  }
+}

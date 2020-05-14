@@ -1,0 +1,14 @@
+{
+  "apps" : [{
+    "name"        : "mystore",
+    "script"      : "./server.js",
+    "exec_mode"   : "fork", //might need to switch from cluster to fork for debugging
+    "instances" : 1,
+    "merge_logs" :true,
+    "env": {
+      "PORT": 8080,
+      "MONITORING": false
+    },
+    "node_args": ["--inspect=0.0.0.0:9229"]
+  }]
+}

@@ -1,0 +1,8 @@
+FROM quay.io/letsencrypt/letsencrypt
+
+RUN apt-get update && apt-get -y install docker.io
+
+RUN chmod +x /bin/start.sh
+ADD start.sh /bin/start.sh
+
+ENTRYPOINT [ "/bin/start.sh" ]

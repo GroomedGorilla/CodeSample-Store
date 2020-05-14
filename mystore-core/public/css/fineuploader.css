@@ -1,0 +1,176 @@
+.fu-progress-bar {
+  width: 100%;
+}
+
+.fu-buttons-col {
+  display: grid;
+  grid-auto-flow: column;
+  grid-column-gap: 10px;
+  margin: 10px;
+  justify-content: center;
+}
+
+.s3-upload-details {
+  display: grid;
+  grid-area: s3-det;
+  grid-auto-flow: row;
+  align-items: center;
+  grid-template-columns: auto auto;
+  grid-row-gap: 10px;
+}
+
+.qq-uploader {
+  min-width: 570px;
+  max-height: none;
+}
+
+button.qq-upload-button-selector {
+  position: inherit;
+  overflow: inherit;
+  direction: inherit;
+}
+
+.qq-upload-list {
+  max-height: none;
+}
+
+.qq-upload-list li {
+  border-left: 0.5em solid var(--jz-purple);
+  margin: 4px 0px;
+  display: grid;
+  grid-template-areas:
+    'select qq-det'
+    'select s3-det';
+  padding: 15px;
+  grid-template-columns: auto 1fr;
+}
+
+.qq-upload-list li:nth-child(odd) {
+  /* background-color: var(--jz-purple);
+  color: white; */
+  border-left: 0.5em solid var(--light-purple);
+}
+
+.qq-upload-line1 {
+  display: grid;
+  grid-area: qq-det;
+  grid-auto-flow: column;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.qq-sound-available {
+  background: var(--light-purple);
+  padding: 1rem;
+  border-radius: 2em;
+}
+
+.qq-upload-file-selector {
+  border-bottom: 3px solid var(--black);
+}
+
+.qq-progress-bar {
+  background: var(--jz-dark-purple);
+}
+
+.qq-upload-list li:nth-child(odd) .qq-progress-bar {
+  background: var(--light-purple);
+}
+
+form.s3-upload-details input:valid {
+  border-bottom: 3px solid var(--active-green);
+}
+
+form.s3-upload-details input:invalid {
+  border-bottom: 3px solid var(--alert-red);
+}
+
+form.s3-upload-details.invalid-form::after {
+  content: "Please enter a valid price and keywords. Tags cannot include any special characters other than commas";
+  line-height: initial;
+  background: var(--alert-red);
+  grid-column: 1 / -1;
+  padding: 5px;
+  color: var(--black);
+  filter: contrast(120%);
+}
+
+form.s3-upload-details>div {
+  display: grid;
+  grid-auto-flow: column;
+}
+
+.upload-results {
+  display: grid;
+  grid-auto-flow: row;
+  grid-template-columns: auto;
+  margin: auto;
+  grid-row-gap: 5px;
+  padding: 5px;
+}
+
+.upload-results div {
+  padding: 5px;
+  line-height: 20px;
+  font-weight: 500;
+  border-left: 5px solid var(--active-green);
+}
+
+.upload-select {
+  grid-area: select;
+  display: grid;
+  align-content: center;
+  justify-self: center;
+  align-items: center;
+  background-color: lightgrey;
+}
+
+.multi-controls {
+  background-color: var(--light-grey);
+  border-radius: 1em;
+  padding: 10px;
+  box-shadow: 0px 0px 5px 1px #d6d6d6;
+  margin-bottom: 2em;
+  display: grid;
+  grid-template-areas:
+    'select select-line1 available'
+    'select select-line2 available';
+  grid-template-columns: 1fr auto 1fr;
+  justify-items: center;
+  grid-column-gap: 2em;
+  grid-row-gap: 5px;
+}
+
+.multi-controls * {
+  font-size: 16px !important;
+  font-weight: 300;
+  line-height: 16px !important;
+  padding: 3px !important;
+}
+
+.selectAll {
+  grid-area: select;
+  align-self: center;
+  display: grid;
+}
+
+.selectAll-top {
+  grid-area: select-line1;
+}
+
+.selectAll-bottom {
+  grid-area: select-line2;
+}
+
+.selectAll-available {
+  grid-area: available;
+  display: grid;
+}
+
+@media screen and (max-width: 1270px) {
+
+  .s3-upload-details {
+    grid-template-columns: auto;
+  }
+
+}

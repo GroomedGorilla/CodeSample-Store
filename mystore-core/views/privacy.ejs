@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+
+<head>
+    <%- include('partials/analytics'); -%>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+        integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <title>MyStore - Privacy Policy</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="top">
+            <% bannerMessage.forEach(function(msg) {  %>
+            <div class="banner bounce-7 <%= msg.type %>"><%= msg.message %></div>
+            <% }); %>
+
+            <% errorMessage.forEach(function(msg) { %>
+            <div class="banner error">
+                <%= msg %>
+            </div>
+            <% }); %>
+
+            <div class="banner success <% if (noMessage) { %> hidden<% } %>">
+                <%= successMsg %>
+            </div>
+
+
+
+            <%- include('partials/user', {user: user}); -%>
+        </div>
+
+        <div class="content">
+            <h2 class="header">Our Privacy Policy</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
+                dolore magna aliqua. Viverra nam libero justo laoreet. Id neque aliquam vestibulum morbi blandit cursus.
+                Integer enim neque volutpat ac. Integer eget aliquet nibh praesent tristique magna sit amet purus. Morbi
+                non arcu risus quis varius quam. Facilisis volutpat est velit egestas dui id ornare. Volutpat odio
+                facilisis mauris sit amet massa vitae. Et ultrices neque ornare aenean euismod. Nisl suscipit adipiscing
+                bibendum est ultricies integer quis auctor. Tincidunt tortor aliquam nulla facilisi cras fermentum odio
+                eu feugiat. Curabitur vitae nunc sed velit dignissim. Neque gravida in fermentum et sollicitudin ac orci
+                phasellus egestas.
+
+                Faucibus pulvinar elementum integer enim neque volutpat ac. Ullamcorper malesuada proin libero nunc
+                consequat interdum varius sit amet. Sodales ut eu sem integer vitae justo. Pellentesque elit ullamcorper
+                dignissim cras tincidunt lobortis feugiat vivamus at. Ut porttitor leo a diam sollicitudin tempor id eu
+                nisl. Pharetra sit amet aliquam id diam maecenas ultricies. Id interdum velit laoreet id donec. Pretium
+                aenean pharetra magna ac placerat vestibulum lectus. Nulla aliquet enim tortor at auctor. In cursus
+                turpis massa tincidunt dui. Tristique nulla aliquet enim tortor at auctor urna nunc. Nibh venenatis cras
+                sed felis eget velit. Massa id neque aliquam vestibulum morbi blandit. Nulla pellentesque dignissim enim
+                sit. Venenatis tellus in metus vulputate eu scelerisque felis. Neque viverra justo nec ultrices dui
+                sapien eget mi. Tortor aliquam nulla facilisi cras fermentum odio eu feugiat. Condimentum vitae sapien
+                pellentesque habitant morbi. Egestas sed sed risus pretium quam vulputate.
+
+                Hac habitasse platea dictumst quisque sagittis purus sit amet volutpat. A lacus vestibulum sed arcu non.
+                Convallis a cras semper auctor neque vitae tempus. Tellus id interdum velit laoreet id donec. At
+                volutpat diam ut venenatis tellus in metus. Eleifend quam adipiscing vitae proin sagittis nisl rhoncus.
+                Facilisi etiam dignissim diam quis enim. Tincidunt tortor aliquam nulla facilisi cras fermentum odio eu
+                feugiat. Nisi quis eleifend quam adipiscing vitae. Nibh nisl condimentum id venenatis a condimentum
+                vitae sapien.
+
+                Ut diam quam nulla porttitor massa id neque aliquam vestibulum. Augue ut lectus arcu bibendum. Vel
+                facilisis volutpat est velit egestas dui. Quam lacus suspendisse faucibus interdum posuere lorem ipsum
+                dolor. Suspendisse in est ante in nibh mauris cursus. Sed lectus vestibulum mattis ullamcorper velit sed
+                ullamcorper morbi. Mauris nunc congue nisi vitae suscipit tellus mauris a. Facilisi nullam vehicula
+                ipsum a arcu cursus vitae congue. Ultrices neque ornare aenean euismod. Tristique magna sit amet purus
+                gravida quis. Adipiscing vitae proin sagittis nisl rhoncus mattis rhoncus urna. Amet justo donec enim
+                diam vulputate ut pharetra. Imperdiet proin fermentum leo vel orci porta. Aliquam vestibulum morbi
+                blandit cursus. Convallis a cras semper auctor neque vitae tempus.
+
+                Nisl suscipit adipiscing bibendum est ultricies integer quis. Est velit egestas dui id. Vitae justo eget
+                magna fermentum iaculis. Amet est placerat in egestas erat imperdiet sed. Leo a diam sollicitudin
+                tempor. Risus pretium quam vulputate dignissim suspendisse in est ante. Elit sed vulputate mi sit amet.
+                Ornare suspendisse sed nisi lacus sed viverra tellus in. Dui faucibus in ornare quam viverra orci
+                sagittis. Enim nunc faucibus a pellentesque sit amet. Diam quis enim lobortis scelerisque fermentum dui
+                faucibus. Arcu ac tortor dignissim convallis aenean et. Purus semper eget duis at tellus at. Viverra
+                aliquet eget sit amet. Massa placerat duis ultricies lacus sed turpis tincidunt id.
+            </p>
+        </div>
+
+        <%- include('partials/footer'); -%>
+    </div>
+</body>
+
+<script src="/static/scripts/menu.js"></script>
+
+</html>

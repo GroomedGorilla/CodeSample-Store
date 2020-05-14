@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+
+<head>
+    <%- include('partials/analytics'); -%>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+        integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <title>MyStore - Contact Us</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="top">
+            <% bannerMessage.forEach(function(msg) {  %>
+            <div class="banner bounce-7 <%= msg.type %>"><%= msg.message %></div>
+            <% }); %>
+
+            <% errorMessage.forEach(function(msg) { %>
+            <div class="banner error">
+                <%= msg %>
+            </div>
+            <% }); %>
+
+            <div class="banner success <% if (noMessage) { %> hidden<% } %>">
+                <%= successMsg %>
+            </div>
+
+            <%- include('partials/user', {user: user}); -%>
+        </div>
+
+        <div class="content">
+            <h2>Contact Us</h2>
+            <p>Have any questions? Something not right? Just want to get in touch? Feel free to drop us a line below.
+                We'll get back to you ASAP</p>
+            <form id="contact-form" action="/contact" method="post">
+                <div id="contact-deets">
+                    <input type="text" name="name" id="contact-name" placeholder="Name" required>
+                    <input type="email" name="email" id="contact-email" placeholder="Email address" required>
+                    <input type="text" name="subject" id="contact-subject" placeholder="Subject" required>
+                </div>
+
+                <textarea name="message" type="text" id="contact-message" placeholder="Message" required></textarea>
+
+                <input type="submit" value="Submit" id="contact-submit">
+            </form>
+        </div>
+
+        <%- include('partials/footer'); -%>
+    </div>
+</body>
+
+<script src="/static/scripts/menu.js"></script>
+<script>
+    (function () {
+        <% if(session.contact) { %>
+            document.getElementById("contact-name").value = "<%= session.contact.name %>";
+            document.getElementById("contact-email").value = "<%= session.contact.email %>";
+            document.getElementById("contact-subject").value = "<%= session.contact.subject %>";
+            document.getElementById("contact-message").value = "<%= session.contact.message %>";
+
+        <% }%>
+    })();
+</script>
+
+</html>

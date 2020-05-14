@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+
+<head>
+  <%- include('partials/analytics'); -%>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+    integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
+  <link href="/fine-uploader/s3.fine-uploader/fine-uploader-new.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/fineuploader.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+
+  <%- include('partials/fineuploader-template'); -%>
+  <script src="/fine-uploader/s3.fine-uploader/s3.fine-uploader.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <title>MyStore - Upload Content</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="top">
+      <% bannerMessage.forEach(function(msg) {  %>
+      <div class="banner bounce-7 <%= msg.type %>"><%= msg.message %></div>
+      <% }); %>
+
+      <% errorMessage.forEach(function(msg) { %>
+      <div class="banner error">
+        <%= msg %>
+      </div>
+      <% }); %>
+
+      <%- include('partials/user', {user: user}); -%>
+    </div>
+
+    <div class="content">
+      <h2 class="header">Sound Upload</h2>
+      <div class="disclaimer">
+          Your files are encrypted and securely stored in Amazon S3 for added protection.
+      </div>
+
+      <!-- show any messages that come back with authentication -->
+      <% message.forEach(function(msg) { %>
+      <div class="banner success">
+        <%= msg %>
+      </div>
+      <% }); %>
+
+      <%if (files.length > 0) { %>
+      <div class="upload-results">
+        <% files.forEach(function(file) { %>
+        <div>
+          <% var category = file.category.split(' ')
+          .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+          .join(' ');
+
+          var subCat = file.subCategory.split(' ')
+          .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+          .join(' '); %>
+          <%= `${file.name} | Price: £${file.price / 100} | Tags: ${file.tags} | Category: ${category} | Sub-Category: ${subCat}` %>
+        </div>
+        <% }); %>
+      </div>
+      <% }; %>
+
+      <div id="uploader">
+        <div class="multi-controls">
+          <div class="selectAll">
+            <button class='button' onclick="selectAllUploads()">Select All</button>
+            <button class='button button-alert' onclick="unSelectAllUploads()">Un-Select All</button>
+          </div>
+          <div class="selectAll-top">
+            <label for='Price'>Price: £
+              <input class="price-input" type="number" step="0.01" min="0" name="Price" placeholder="5">
+            </label>
+            <button class='button button-alert' title='Apply to Selection'
+              onClick='applyPriceToSelected()'>Apply</button>
+            <label for='SoundTags'>Tags:
+              <input class="soundtag-input" type="text" name="SoundTags" pattern="[a-zA-Z0-9, ]+"
+                placeholder="e.g. Storm, Rain">
+            </label>
+            <button class='button button-alert' title='Apply to Selection'
+              onClick='applyTagsToSelected()'>Apply</button>
+          </div>
+          <div class="selectAll-bottom">
+            <label for="category">Category
+              <select name="category" onchange="changeSubCat(this)">
+                <option value="none">No Change</option>
+                <option value="sound">SFX</option>
+                <option value="music">Music</option>
+              </select>
+            </label>
+            <label for="subCategory" id="lblSubCat">Sub-Category
+              <select name="subCategory" id="soundSubs">
+                <option value="none">No Change</option>
+                <% soundCategories.forEach(function(sound) { %>
+                <option value="<%= sound.name.toLowerCase() %>"><%= sound.name %></option>
+                <% }); %>
+              </select>
+              <select class='hidden' name="subCategory" id="musicSubs">
+                <option value="none">No Change</option>
+                <% musicCategories.forEach(function(music) { %>
+                <option value="<%= music.name.toLowerCase() %>"><%= music.name %></option>
+                <% }); %>
+              </select>
+            </label>
+            <button class='button button-alert' onClick='applyCategoryChangeToSelected()'>Apply to Selection</button>
+          </div>
+          <div class="selectAll-available">
+            <button class="button" title="Set as Available" onclick="setSelectedAvailability(true)">Set
+              Available</button>
+            <button class="button" title="Set as Unavailable" onclick="setSelectedAvailability(false)">Set
+              Unavailable</button>
+          </div>
+        </div>
+      </div>
+      <script src="/static/scripts/fineuploader.js"></script>
+    </div>
+
+    <%- include('partials/footer'); -%>
+  </div>
+</body>
+
+
+<script>
+  function changeSubCat(sender) {
+    switch (sender.value) {
+      case 'sound':
+        sender.parentElement.parentElement.children.lblSubCat.children.soundSubs.classList.remove('hidden');
+        sender.parentElement.parentElement.children.lblSubCat.children.musicSubs.classList.add('hidden');
+        break;
+
+      case 'music':
+        sender.parentElement.parentElement.children.lblSubCat.children.soundSubs.classList.add('hidden');
+        sender.parentElement.parentElement.children.lblSubCat.children.musicSubs.classList.remove('hidden');
+        break;
+
+      default:
+        break;
+    }
+  }
+</script>
+
+</html>

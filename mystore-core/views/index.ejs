@@ -1,0 +1,47 @@
+<!-- views/resend.ejs -->
+<!doctype html>
+<html>
+
+<head>
+    <%- include('partials/analytics'); -%>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+        integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <title>MyStore - The Sound Discovery Platform</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="top">
+            <% errorMessage.forEach(function(msg) { %>
+            <div class="banner error">
+                <%= msg %>
+            </div>
+            <% }); %>
+
+            <%- include('partials/user', {user: user}); -%>
+        </div>
+
+        <div class="content">
+            <h2>Welcome To MyStore</h2>
+            <a href="/login" class="button">Login</a>
+            <a href="/signup" class="button button-main">Sign Up</a>
+
+            <hr>
+            <div>
+                <a href="/forgot">Forgot Your Password?</a>
+            </div>
+        </div>
+
+        <%- include('partials/footer'); -%>
+
+    </div>
+</body>
+<script src="/static/scripts/menu.js"></script>
+
+</html>

@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+
+<head>
+    <%- include('partials/analytics'); -%>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+        integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/2.0.6/wavesurfer.min.js"></script>
+
+    <title>Overview & Checkout</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="top">
+            <% bannerMessage.forEach(function(msg) {  %>
+            <div class="banner bounce-7 <%= msg.type %>"><%= msg.message %></div>
+            <% }); %>
+
+            <%- include('partials/user', {user: user}); -%>
+        </div>
+
+        <div class="playback">
+            <div id="waveform-container" class="player">
+                <div id="waveform"></div>
+
+                <div class="lds-ripple hidden">
+                    <div></div>
+                    <div></div>
+                </div>
+
+                <button id="play-pause" class="" onclick="togglePlay()">
+                    <i class="fas fa-play-circle fa-4x play-pause-icon"></i>
+                </button>
+
+            </div>
+            <div class="sound-info hidden">
+                <h4>-</h4>
+                <em>-</em>
+                <a class="hidden" href="">Add To Cart</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2 class="header">Review & Confirm Your Order</h2>
+            <div class="checkout-panels">
+                <% if (products) { %>
+                <div class="cart-info">
+                    <h3>Your Order</h3>
+                    <% products.forEach(function(product) { %>
+                    <div class="cart-item">
+                        <span class="cart-item-name"><%= `${product.item.name}` %></span>
+                        <span class="cart-item-price">£<%= `${product.price / 100}` %></span>
+                        <div class="sound-controls">
+                            <button class="fa fa-play"
+                                onclick='loadPreviewCheckout(this, "<%= product.item.previewLocation %>")'></button>
+                        </div>
+                    </div>
+                    <% }); %>
+
+                    <span class="cart-total">Cart Subtotal: £
+                        <%= total / 100 %>
+                    </span>
+                </div>
+                <% } %>
+
+                <div class="card-body">
+                    <div id="charge-error" class="banner error  <% if (noErrors) { %> hidden<% } %>">
+                        <%= errMsg %>
+                    </div>
+
+                    <form action="/checkout" method="post" id="payment-form">
+                        <!-- <div class="">
+                        <div class="">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" class="" required name="name">
+                        </div>
+                    </div> -->
+
+
+                        <div class="gridcols">
+                            <label for="card-name">Card Holder Name</label>
+                            <img loading="lazy"
+                                src="/static/assets/images/Stripe badge/Outline Dark/powered_by_stripe.svg"
+                                alt="Powered by Stripe" style="
+    justify-self: right;
+">
+                        </div>
+                        <input type="text" id="card-name" class="" required>
+
+                        <label for="address">Address</label>
+                        <input type="text" id="address" class="" required name="address">
+
+                        <hr>
+                        <label for="card-element">
+                            Credit or Debit Card
+                        </label>
+                        <div id="card-element">
+                            <!-- A Stripe Element will be inserted here. -->
+                        </div>
+                        <!-- Used to display Element errors. -->
+                        <div id="card-errors" role="alert"></div>
+                        <button id="btn-pay" class="button button-main">Submit Payment</button>
+                    </form>
+                </div>
+            </div>
+            <div class="disclaimer">
+                We rely on Stripe to process all financial transaction. <br>This means you can rest assured your personal
+                information does not touch our servers and is kept secure.
+            </div>
+        </div>
+
+        <%- include('partials/footer'); -%>
+    </div>
+</body>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script src="/static/scripts/menu.js"></script>
+<script src="/static/scripts/audio.js"></script>
+<script src="/static/scripts/checkout.js"></script>
+
+</html>

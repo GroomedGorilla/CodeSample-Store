@@ -1,0 +1,77 @@
+<!-- views/signup.ejs -->
+<!doctype html>
+<html>
+
+<head>
+  <%- include('partials/analytics'); -%>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+    integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+
+  <title>MyStore - Sign Up</title>
+</head>
+
+<body>
+  <div class="container">
+    <div class="top">
+      <% message.forEach(function(msg) { %>
+      <div class="banner error">
+        <%= msg %>
+      </div>
+      <% }); %>
+
+      <%- include('partials/user', {user: user}); -%>
+    </div>
+
+    <div class="content">
+      <h2>Sign Up</h2>
+      <form id="user-form" action="/signup" method="post">
+        <label>Name</label>
+        <input type="text" name="name" required>
+        <label>Surname</label>
+        <input type="text" name="surname" required>
+        <label>Email</label>
+        <input type="text" name="email" required>
+        <p class="panel-info">Passwords must be at least 8 characters long and include a
+          combination of numbers, letters and symbols.</p>
+        <label for="password">Password</label>
+        <input id="password" name="password" type="password" minlength="8"
+          pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?#.&])[A-Za-z0-9@$!%*?#.&]{8,}.*"
+          oninput="setCustomValidity('')" oninvalid="setCustomValidity(
+                                        'Must be 8 or more characters long and contain one number, one uppercase and lowercase letter and a symbol'
+                                    )" required>
+        <label for="confirmPass">Confirm Password</label>
+        <input id="confirmPass" name="confirmPass" type="password" minlength="8"
+          pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?#.&])[A-Za-z0-9@$!%*?#.&]{8,}.*"
+          onkeyup="checkPass(this)" oninvalid="setCustomValidity(
+                                        'Must be 8 or more characters long and contain one number, one uppercase and lowercase letter and a symbol'
+                                    )" oninput="setCustomValidity('')" required>
+        <ul id="passWarning" class="hidden">
+          <li class="panel-warning">New passwords must match.</li>
+          <li class="panel-warning">Must include lowercase and uppercase letters</li>
+          <li class="panel-warning">Must be at least 8 characters in length, and a maximum of
+            16</li>
+          <li class="panel-warning">Must contain at least one number and one symbol</li>
+        </ul>
+
+        <button type="submit" class="button">Sign Up</button>
+      </form>
+
+      <hr>
+      <div>
+        <p>Already have an account? <a href="/login">Login</a></p>
+        <p>Or go <a href="/">home</a>.</p>
+      </div>
+    </div>
+
+    <%- include('partials/footer'); -%>
+
+  </div>
+</body>
+<script src="/static/scripts/menu.js"></script>
+<script src="/static/scripts/user_mgmt.js"></script>
+</html>

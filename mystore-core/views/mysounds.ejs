@@ -1,0 +1,338 @@
+<!-- views/mysounds.ejs -->
+<!doctype html>
+<html>
+
+<head>
+    <%- include('partials/analytics'); -%>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+        integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/2.0.6/wavesurfer.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <title>My Sounds - <%= user.name %></title>
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="top">
+            <% bannerMessage.forEach(function(msg) {  %>
+            <div class="banner bounce-7 <%= msg.type %>"><%= msg.message %></div>
+            <% }); %>
+
+            <!-- show any messages that come back with authentication -->
+            <% message.forEach(function(msg) { %>
+            <div class="banner success">
+                <%= msg %>
+            </div>
+            <% }); %>
+
+            <% errorMessage.forEach(function(msg) { %>
+            <div class="banner error">
+                <%= msg %>
+            </div>
+            <% }); %>
+
+            <%- include('partials/user', {user: user}); -%>
+        </div>
+
+        <div class="playback">
+            <div id="waveform-container" class="player">
+                <div id="waveform"></div>
+
+                <div class="lds-ripple hidden">
+                    <div></div>
+                    <div></div>
+                </div>
+
+                <button id="play-pause" class="" onclick="togglePlay()">
+                    <i class="fas fa-play-circle fa-4x play-pause-icon"></i>
+                </button>
+
+            </div>
+            <div class="sound-info hidden">
+                <h4>-</h4>
+                <em>-</em>
+            </div>
+        </div>
+
+        <div class="content">
+            <%if (soundsList.length > 0) { %>
+            <h2 class="header">My Sounds</h2>
+
+            <% if(pages.total > 1) { %>
+            <h3>Showing Page <%= pages.current %> of <%= pages.total %> of your sounds </h3>
+            <div>
+                <% for(var i=1; i<pages.total+1; i++) {%>
+                <a <% if(i!=pages.current) {%>href="/mysounds/<%= i %>" <% } %>
+                    class="button <% if(i==pages.current) {%>button-alert<% } %> "><%= i %></a>
+                <% } %>
+            </div>
+            <% } %>
+
+            <div class="sounds">
+                <% soundsList.forEach(function(sound) { %>
+                <form id="form-<%= sound.uuid %>" class="my-sound-item <%if(sound.available) { %> available <% } %>"
+                    action="/mysounds/<%= sound.uuid %>" method="post">
+                    <fieldset disabled>
+                        <div class="sound-details">
+                            <div>
+                                <label for="soundName">Name:
+                                    <input class="sound-attribute sound-name" id="soundName" type="text" name="name"
+                                        value="<%= sound.name %>" required data-value-missing="Required">
+                                </label>
+
+                                <label for="soundPrice">Price: £
+                                    <input class="sound-attribute sound-price" id="soundPrice" type="number" step="0.01"
+                                        min="0" name="price" value="<%= sound.price / 100 %>" required
+                                        data-value-missing="Required">
+                                </label>
+
+
+
+                                <label for="soundTags">Tags:
+                                    <input class="sound-attribute" id="soundTags" type="text" name="soundTags"
+                                        pattern="[a-zA-Z0-9, ]+" placeholder="Comma Separated (e.g. Storm, Rain)"
+                                        value="<%= sound.keywords.join(', ') %>">
+                                </label>
+
+
+                                <label for="sound-available" class="form-check-label" for="exampleCheck1">Available
+                                    <input type="checkbox" class="sound-attribute form-check-input" id="sound-available"
+                                        name="available" value="<%if(sound.available) { %>on<% } else {%>off<% }; %>"
+                                        <%if(sound.available) { %> checked <% } %>>
+                                </label>
+                            </div>
+
+                            <div class="form-categories">
+                                <label for="category">Category
+                                    <select name="category" class='sound-attribute' onchange="changeSubCat(this)"
+                                        defaultValue='<%= sound.category.toLowerCase() %>'>
+                                        <option value="sound" <% if(sound.category=='sound' ) {%>selected <% } %>>
+                                            SFX</option>
+                                        <option value="music" <% if(sound.category=='music' ) {%>selected <% } %>>
+                                            Music</option>
+                                    </select>
+                                </label>
+                                <label for="subCategory">Sub-Category
+                                    <select class='sound-attribute<% if(sound.category != 'sound') { %> hidden<% } %>'
+                                        name="subCategory" id="soundSubs">
+                                        <% soundCategories.forEach(function(soundCat) { %>
+                                        <option value="<%= soundCat.name.toLowerCase() %>"
+                                            <% if(sound.subcat==soundCat.name) { %>selected<% } %>>
+                                            <%= soundCat.name %>
+                                        </option>
+                                        <% }); %>
+                                    </select>
+
+                                    <select class='sound-attribute<% if(sound.category != 'music') { %> hidden <% } %>'
+                                        name="subCategory" id="musicSubs">
+                                        <% musicCategories.forEach(function(musicCat) { %>
+                                        <option value="<%= musicCat.name.toLowerCase() %>"
+                                            <% if(sound.subcat==musicCat.name) { %>selected<% } %>>
+                                            <%= musicCat.name %>
+                                        </option>
+                                        <% }); %>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <div class="my-sound-controls">
+                        <button type="button" name="btnDownload" class="fa fa-download" title="Download Sound"
+                            onclick='getFile("<%= sound.uuid %>", "<%= sound.name %>", "<%= sound.fileExtension %>")'>
+                        </button>
+
+                        <button type="button" name="btnPlay" class="fa fa-play" title="Play Sound"
+                            onclick='loadSound(this, "<%= sound.uuid %>")'>
+                        </button>
+                    </div>
+                    <div class="edit-controls">
+                        <button type="button" name="btnEnableEdits" class="button button-alert"
+                            title="Edit Sound Details" onclick="enableSoundEdits(this,
+                                            '<%=sound.uuid %>')">
+                            <i class="fa fa-edit"></i> Edit
+                        </button>
+                        <button type="button" name="btnCancelEdits" class="button button-warning hidden"
+                            title="Cancel Edits" onclick="cancelSoundEdits(this, '<%=sound.uuid %>')">
+                            <i class="far fa-window-close"></i> Cancel
+                        </button>
+                        <button type="button" name="btnSaveEdits" class="button success hidden" title="Save Edits"
+                            onclick="saveSoundEdits('<%=sound.uuid %>')">
+                            <i class="far fa-save"></i> Save
+                        </button>
+                    </div>
+                </form>
+                <% }); %>
+            </div>
+            <% } else {%>
+            <h2 class="header">No Results Found.</h2>
+            <% }; %>
+
+        </div>
+
+        <%- include('partials/footer'); -%>
+
+    </div>
+</body>
+<script src="/static/scripts/audio.js"></script>>
+<script src="/static/scripts/menu.js"></script>
+<!-- <script src="static/scripts/page.js"></script> -->
+<!-- Important for script to be added after body -->
+<script>
+    function saveSoundEdits(soundID) {
+        var form = document.getElementById(`form-${soundID}`);
+
+        //detect change in checkbox
+        var availabilityChanged = false;
+        form.querySelectorAll('#sound-available').forEach(x => {
+            var state = x.value == 'on';
+            availabilityChanged = (state != x.checked)
+        })
+
+        var cat = form.querySelector('select[name="category"]')
+        var categoryChanged = !cat.options[cat.selectedIndex].defaultSelected
+        var subCatSelector = form.querySelector('select[name="subCategory"]:not(.hidden)');
+        var subCatChanged = !subCatSelector.options[subCatSelector.selectedIndex].defaultSelected;
+
+        // if any form inputs (except selects) have changed, or cat/subcat has changed
+        if ([...form.querySelectorAll('.sound-attribute:not(select)')].some(field => field.value != field
+                .defaultValue) ||
+            availabilityChanged || categoryChanged || subCatChanged) {
+            // var unchanged = [...form.querySelectorAll('.profile-attribute')].filter(field => field.value == field.defaultValue);
+            // unchanged.map(f => f.setAttribute('disabled', true));
+            // form.submit();
+            form.elements['btnCancelEdits'].setAttribute('disabled', true);
+            form.elements['btnSaveEdits'].setAttribute('disabled', true);
+
+            var data = {};
+
+            [...form.querySelectorAll('.sound-attribute:not(.hidden)')].map(x => {
+                if (x.type == 'checkbox') {
+                    data[x.name] = x.checked
+                } else {
+                    if (x.name == 'price') {
+                        data[x.name] = x.value * 100;
+                    } else {
+                        data[x.name] = x.value
+                    }
+                }
+            })
+
+            form.getElementsByTagName('fieldset')[0].setAttribute('disabled', ''); //disable form inputs
+            form.elements['btnEnableEdits'].classList.toggle('hidden');
+            form.elements['btnEnableEdits'].setAttribute('disabled', '');
+            form.elements['btnSaveEdits'].classList.toggle('hidden');
+            form.elements['btnCancelEdits'].classList.toggle('hidden');
+            // const formData = new FormData();
+
+            // var labels = ['name', 'price', 'soundTags', 'available'];
+
+            // labels.map(label => formData.append(label, data[label]));
+
+            axios.post(`/mysounds/${soundID}`, data)
+                .then((response) => {
+                    form.elements['btnEnableEdits'].removeAttribute('disabled');
+                    form.elements['btnCancelEdits'].removeAttribute('disabled');
+                    form.elements['btnSaveEdits'].removeAttribute('disabled');
+                    if (response.status == 200) {
+                        //TODO SHOW OK SIGN
+                        if (form.querySelector('#sound-available').checked) {
+                            form.classList.add('available')
+                            form.querySelector('#sound-available').value = 'on'
+                        } else {
+                            form.classList.remove('available')
+                            form.querySelector('#sound-available').value = 'off'
+                        }
+                        addSoundMessage(form, response.data);
+                    } else {
+                        addSoundMessage(form,
+                            `Something went wrong. Please try again soon or contact support if the issue persists.`,
+                            true
+                        );
+                    }
+                    console.log(response)
+                })
+                .catch((err) => {
+                    debugger;
+                    form.elements['btnEnableEdits'].removeAttribute('disabled');
+                    form.elements['btnCancelEdits'].removeAttribute('disabled');
+                    form.elements['btnSaveEdits'].removeAttribute('disabled');
+                    addSoundMessage(form, err.response.data, true);
+                    // console.log(`Axios Error on sound details submit - ${err}`);
+                })
+            // document.getElementsByName('btnEnableEdits').forEach((field) => field.setAttribute('disabled', true));
+            // document.getElementsByName('btnSaveEdits').forEach((field) => field.setAttribute('disabled', true));
+            // document.getElementsByName('btnCancelEdits').forEach((field) => field.setAttribute('disabled', true));
+            // form.querySelectorAll('.profile-attribute').forEach((field) => field.setAttribute('disabled', true));
+        } else {
+            cancelSoundEdits(form.elements['btnCancelEdits'], soundID);
+        }
+    }
+
+    function enableSoundEdits(sender, soundID) {
+        var form = document.getElementById(`form-${soundID}`);
+        clearSoundMessages(form);
+        form.getElementsByTagName('fieldset')[0].removeAttribute('disabled'); //enable form inputs
+        sender.classList.toggle('hidden'); //hide edit button
+        form.elements['btnCancelEdits'].classList.toggle('hidden');
+        form.elements['btnSaveEdits'].classList.toggle('hidden');
+        // form.querySelectorAll('.profile-attribute').forEach((field) => field.removeAttribute('disabled'))
+    }
+
+    function cancelSoundEdits(sender, soundID) {
+        var form = document.getElementById(`form-${soundID}`);
+        form.getElementsByTagName('fieldset')[0].setAttribute('disabled', ''); //disable form inputs
+        sender.classList.toggle('hidden');
+        form.elements['btnEnableEdits'].classList.toggle('hidden');
+        form.elements['btnSaveEdits'].classList.toggle('hidden');
+        // Reset sound form details
+        form.querySelectorAll('.sound-attribute:not(select)').forEach((field) => {
+            field.value = field.defaultValue;
+        });
+        form.querySelectorAll('select.sound-attribute').forEach((field) => {
+            var def = [...field].findIndex(x => x.defaultSelected);
+            if (def < 0) {
+                field.classList.add('hidden');
+            } else {
+                field.classList.remove('hidden');
+            }
+            field.selectedIndex = def >= 0 ? def : 0;
+        });
+        //TODO revert back to original hidden subcategory
+        // If subcategory selector has a default >= 0 then set the category selector to match the subcat
+        form.querySelectorAll('#sound-available').forEach((x) => {
+            x.value === 'on' ? x.checked = true : x.checked = false;
+        })
+    }
+
+    function changeSubCat(sender) {
+        sender.parentElement.children.soundSubs.classList.toggle('hidden');
+        sender.parentElement.children.musicSubs.classList.toggle('hidden');
+    }
+
+    function addSoundMessage(form, message, error = false) {
+        if (message != '') {
+            var msg = document.createElement('div');
+            msg.className = 'sound-message';
+            if (error) {
+                msg.classList.add('sound-error')
+            }
+            msg.textContent = message;
+            form.appendChild(msg)
+        }
+    }
+
+    function clearSoundMessages(form) {
+        var msgs = form.querySelectorAll('.sound-message');
+        [...msgs].map(x => form.removeChild(x));
+    }
+</script>
+
+
+</html>

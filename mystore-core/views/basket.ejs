@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+
+<head>
+    <%- include('partials/analytics'); -%>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+        integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/2.0.6/wavesurfer.min.js"></script>
+
+    <title>Shopping Cart</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="top">
+            <% bannerMessage.forEach(function(msg) {  %>
+            <div class="banner bounce-7 <%= msg.type %>"><%= msg.message %></div>
+            <% }); %>
+
+            <div class="banner success <% if (noMessage) { %> hidden<% } %>">
+                <%= successMsg %>
+            </div>
+
+            <%- include('partials/user', {user: user}); -%>
+        </div>
+
+        <div class="playback">
+            <div id="waveform-container" class="player">
+                <div id="waveform"></div>
+
+                <div class="lds-ripple hidden">
+                    <div></div>
+                    <div></div>
+                </div>
+
+                <button id="play-pause" class="" onclick="togglePlay()">
+                    <i class="fas fa-play-circle fa-4x play-pause-icon"></i>
+                </button>
+
+            </div>
+            <div class="sound-info hidden">
+                <h4>-</h4>
+                <em>-</em>
+                <a class="hidden" href="">Add To Cart</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <h2 class="header">Shopping Cart</h2>
+
+            <% if (products) { %>
+            <div class="sounds">
+                <% products.forEach(function(product) { %>
+                <div class="sound-item">
+                    <div class="sound">
+                        <span class="sound-name"><%=`${product.item.name}`%></span>
+                    </div>
+                    <span class="sound-price"><%=`£${product.price / 100}`%></span>
+                    <div class="sound-controls">
+                        <button class="fa fa-play"
+                            onclick='loadPreview(this, "<%= product.item.previewLocation %>")'></button>
+                        <button class="fa fa-pause" onclick='wavesurfer.pause()'></button>
+                        <a name="removeFromCart" href='/removeFromCart/<%= product.item.uuid %>' type="button"
+                            class=""><button class="button-warning fas fa-minus" title="Remove From Cart">
+                            </button>
+                        </a>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+            <hr>
+            <div class="checkout-controls">
+                <h3>Total: £<%= totalPrice / 100 %></h3>
+                <a href='/checkout' type="button" class="button button-main">Checkout</a>
+            </div>
+            <% } else {%>
+            <hr>
+            <h3>No items in cart</h3>
+            <% } %>
+        </div>
+
+        <%- include('partials/footer'); -%>
+    </div>
+</body>
+
+<script src="/static/scripts/menu.js"></script>
+<script src="/static/scripts/audio.js"></script>
+
+</html>

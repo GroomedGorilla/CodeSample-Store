@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+
+<head>
+    <%- include('partials/analytics'); -%>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+        integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/2.0.6/wavesurfer.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <title>MyStore - The Sound Discovery Platform</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="top">
+            <% bannerMessage.forEach(function(msg) {  %>
+            <div class="banner bounce-7 <%= msg.type %>"><%= msg.message %></div>
+            <% }); %>
+
+            <!-- show any messages that come back with authentication -->
+            <% message.forEach(function(msg) { %>
+            <div class="banner success">
+                <%= msg %>
+            </div>
+            <% }); %>
+
+            <% errorMessage.forEach(function(msg) { %>
+            <div class="banner error">
+                <%= msg %>
+            </div>
+            <% }); %>
+
+            <%- include('partials/user', {user: user}); -%>
+        </div>
+
+        <div class="playback">
+            <div id="waveform-container" class="player">
+                <div id="waveform"></div>
+
+                <div class="lds-ripple hidden">
+                    <div></div>
+                    <div></div>
+                </div>
+
+                <button id="play-pause" class="" onclick="togglePlay()">
+                    <i class="fas fa-play-circle fa-4x play-pause-icon"></i>
+                </button>
+
+            </div>
+            <div class="sound-info hidden">
+                <h4>-</h4>
+                <em>-</em>
+            </div>
+        </div>
+
+        <div class="content">
+            <%if (soundsList.length > 0) { %>
+            <h2 class="header">My Collection</h2>
+
+            <% if(pages.total > 1) { %>
+                <h3>Showing Page <%= pages.current %> of <%= pages.total %> of your purchases</h3>
+                <div>
+                    <% for(var i=1; i<pages.total+1; i++) {%>
+                    <a <% if(i!=pages.current) {%>href="/purchases/<%= i %>" <% } %>
+                        class="button <% if(i==pages.current) {%>button-alert<% } %> "><%= i %></a>
+                    <% } %>
+                </div>
+                <% } %>
+
+            <div class="sounds">
+                <% soundsList.forEach(function(sound) { %>
+                <div class="sound-item">
+                    <div class="sound">
+                        <span class="sound-name"><%=`${sound.name}`%></span>
+                    </div>
+                    <span class="sound-price"><%=`£${sound.price / 100}`%></span>
+                    <div class="sound-controls">
+                        <button class="fa fa-play" onclick='loadSound(this, "<%= sound.uuid %>")'></button>
+                        <button class="fa fa-pause" onclick='wavesurfer.pause()'></button>
+                        <button class="fa fa-download"
+                            onclick='getFile("<%= sound.uuid %>", "<%= sound.name %>", "<%= sound.fileExtension %>")'></button>
+                    </div>
+                </div>
+                <% }); %>
+            </div>
+            <% } else {%>
+            <h2 class="header">No Purchases Made.</h2>
+            <a href="/home">Why not change that?</a>
+            <% }; %>
+        </div>
+
+        <%- include('partials/footer'); -%>
+    </div>
+</body>
+<script src="/static/scripts/audio.js"></script>
+<script src="/static/scripts/menu.js"></script>
+
+</html>

@@ -1,0 +1,16 @@
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-127792055-2"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    <% if (locals.user && typeof locals.user != 'undefined') { %>
+    gtag('config', 'UA-127792055-2', {'user_id': '<%= user.id %>'});
+    <% } else { %>
+        gtag('config', 'UA-127792055-2');
+    <% } %>
+
+</script>

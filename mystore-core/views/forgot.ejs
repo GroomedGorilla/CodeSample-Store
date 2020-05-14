@@ -1,0 +1,57 @@
+<!-- views/forgot.ejs -->
+<!doctype html>
+<html>
+
+<head>
+    <%- include('partials/analytics'); -%>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
+        integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Sans" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <title>MyStore - Forgot Password</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="top">
+            <% errorMessage.forEach(function(msg) { %>
+            <div class="banner error">
+                <%= msg %>
+            </div>
+            <% }); %>
+
+            <% message.forEach(function(msg) { %>
+            <div class="banner success">
+                <%= msg %>
+            </div>
+            <% }); %>
+
+            <%- include('partials/user', {user: user}); -%>
+        </div>
+
+        <div class="content">
+            <h2>Forgot Your Password?</h2>
+            <form id="user-form" action="/forgot" method="post">
+                <label for="email">Email</label>
+                <input type="text" name="email">
+                <button type="submit" class="button button-alert">Reset Password</button>
+            </form>
+
+            <hr>
+            <div>
+                <p>Need an account? <a href="/signup">Signup</a></p>
+                <p>Or go <a href="/">home</a>.</p>
+            </div>
+        </div>
+
+        <%- include('partials/footer'); -%>
+
+    </div>
+</body>
+<script src="/static/scripts/menu.js"></script>
+
+</html>
